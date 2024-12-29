@@ -7,6 +7,7 @@ import salesRoutes from "./routes/salesRoutes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import forecast from "./routes/forecastRouter.js";
+import employeeRouter from "./routes/employeeRoutes.js";
 import multer from 'multer'
 config();
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 
 
 app.use("/admin", router);
+app.use("/employee", employeeRouter);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/sales", salesRoutes);
 app.use("/api/v1/forecast",forecast)
