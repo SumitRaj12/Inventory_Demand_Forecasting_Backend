@@ -9,11 +9,11 @@ export const highlights = async (req, res) => {
     const sales = await Sales.find({ companyName: company });
     const product = await Products.find({ companyName: company });
     const products = new Set();
-    const customer = new Set();
+    const region = new Set();
     let totalItems = 0;
 
     sales.forEach((item) => {
-      customer.add(item.customerId);
+      region.add(item.region);
       totalItems += item.unitsSold;
     });
     product.forEach((item) => {
@@ -25,7 +25,7 @@ export const highlights = async (req, res) => {
       message: "Successful fetch",
       data: {
         totalProduct: products.size,
-        totalCustomer: customer.size,
+        totalRegion: region.size,
         totalItems,
       },
     });

@@ -32,4 +32,13 @@ const changePassword = async(req,res)=>{
     }
 }
 
-export default changePassword;
+const Role = async(req,res)=>{
+    try {
+        const user = req.user;
+        res.status(200).json({status:"Success",message:"Fetch Successful",role:user.Role==="Admin"?true:false})
+    } catch (error) {
+        res.status(500).json({status:"Internal Server Error",message:"Something went wrong"})
+    }
+}
+
+export { changePassword,Role};

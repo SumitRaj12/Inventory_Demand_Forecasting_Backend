@@ -101,7 +101,7 @@ const adminLogin = async (req, res) => {
 
   // Compare the provided password with the stored hashed password
   const validPassword = await comparePassword(isUser.Password, Password);
-
+  
   // If the password is invalid, return an error response
 
   if (!validPassword)
@@ -334,7 +334,8 @@ const deleteEmployee = async (req, res) => {
 const getAllEmployees = async (req, res) => {
   try {
     // Fetching employees from the database
-    const employees = await Employee.find(); // Assuming Employee is your model
+    const user = req.user;
+    const employees = await Employee.find({companyName:user.companyName}); // Assuming Employee is your model
 
     // Check if 'companyName' exists in each employee object
     const employeesWithCompanyName = employees.map((employee) => {
@@ -346,7 +347,7 @@ const getAllEmployees = async (req, res) => {
       return employee;
     });
 
-    res.json(employeesWithCompanyName);
+    res.json({employee:employeesWithCompanyName,role:user.Role==="Admin"?true:false});
   } catch (error) {
     console.error("Error fetching employees:", error);
     res.status(500).json({ message: "Error fetching employees" });

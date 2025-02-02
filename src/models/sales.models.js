@@ -11,8 +11,8 @@ const salesSchema = new mongoose.Schema(
     productName:{
       type:String
     },
-    storeId:{
-      type:Number
+    region:{
+      type:String
     },
     productId: {
       type: String,
@@ -31,6 +31,34 @@ const salesSchema = new mongoose.Schema(
     month: {
       type: String,
       required: true,
+    },
+    date:{
+      type:Date,
+      required:true
+    },
+    weekday:{
+      type:String,
+    },
+    festival:{
+      type:Boolean
+    },
+    promotion:{
+      type:Boolean
+    },
+    pricePerUnit:{
+      type:Number
+    },
+    adSpent:{
+      type:Number
+    },
+    Weather:{
+      type:String
+    },
+    customerSegment:{
+      type:String
+    },
+    stockLevel:{
+      type:Number
     },
     filePath:{
       type:String

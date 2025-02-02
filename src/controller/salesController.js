@@ -36,38 +36,53 @@ export const createSaleController = async (req, res) => {
         try {
           // Extract and validate fields from the row
           const {
-            id,
-            date,
-            store, // Assuming these are column names in the CSV
-            item,
-            unitSold,
-            sales,
-            product_name,
-            customer_name,
+            Product_ID,
+            Product_Name,
+            Date,
+            Sales, // Assuming this is the ProductID in the CSV
+            Sales_Revenue,
+            Month,
+            Weekday,
+            Festival_Flag,
+            Promotion,
+            Price,
+            Stock_Level,
+            Advertising_Spend,
+            Weather,
+            Customer_Segment,
+            Region,
           } = row;
-
+          // console.log(row)
           // Validate required fields
-          if (!date || !item || !sales || !customer_name) {
+          if (!Date || !Product_ID || !Sales || !Sales_Revenue) {
             return; // Skip invalid rows
           }
 
-          // Parse the date using moment.js for the `DD-MM-YYYY` format
-          const parsedDate = moment(date.trim(), "DD-MM-YYYY", true);
-          if (!parsedDate.isValid()) {
-            console.warn(`Invalid date format in row: ${JSON.stringify(row)}`);
-            return; // Skip rows with invalid dates
-          }
+          // // Parse the date using moment.js for the `DD-MM-YYYY` format
+          // const parsedDate = moment(date.trim(), "DD-MM-YYYY", true);
+          // if (!parsedDate.isValid()) {
+          //   console.warn(`Invalid date format in row: ${JSON.stringify(row)}`);
+          //   return; // Skip rows with invalid dates
+          // }
 
           // Map and clean the data for MongoDB
           salesData.push({
             id: id,
-            date: parsedDate.toDate(), // Convert moment date to JavaScript Date
-            storeId: store?.trim() || null,
-            productId: item.trim(),
-            unitsSold: parseInt(unitSold.trim(), 10), // Convert `sales` to a number
-            sales: parseInt(sales.trim(), 10),
-            productName: product_name?.trim() || null,
-            customerId: customer_name.trim(),
+            productId: Product_ID.trim(),
+            productName: Product_Name?.trim() || null,
+            unitsSold: parseInt(Sales.trim(), 10), // Fix field name here
+            sales: parseInt(Sales_Revenue.trim(), 10),
+            month: Month,
+            date: Date,
+            weekday: Weekday,
+            festival: Festival_Flag,
+            promotion: Promotion,
+            pricePerUnit: Price,
+            adSpent: Advertising_Spend,
+            weather: Weather,
+            customerSegment: Customer_Segment,
+            stockLevel: Stock_Level,
+            region: Region,
             companyName: req.user?.companyName || "Default Company", // Default value for company
             filePath: csvFilePath,
           });
@@ -150,47 +165,63 @@ export const updatedcreateSaleController = async (req, res) => {
         try {
           // Extract and validate fields from the row
           const {
-            id,
-            date,
-            item, // Assuming this is the ProductID in the CSV
-            unitSold,
-            sales,
-            product_name,
+            Product_ID,
+            Product_Name,
+            Date,
+            Sales, // Assuming this is the ProductID in the CSV
+            Sales_Revenue,
+            Month,
+            Weekday,
+            Festival_Flag,
+            Promotion,
+            Price,
+            Stock_Level,
+            Advertising_Spend,
+            Weather,
+            Customer_Segment,
+            Region,
           } = row;
 
           // Validate required fields
-          if (!date || !item || !unitSold || !sales) {
+          if (!Date || !Product_ID || !Sales || !Sales_Revenue) {
             return; // Skip invalid rows
           }
 
-          // Parse the date using moment.js for the `DD-MM-YYYY` format
-          const parsedDate = moment(date.trim(), "YYYY-MM-DD", true);
+          // Assuming `row.Date` contains the date in `DD-MM-YYYY` format
+          const parsedDate = moment(row.Date.trim(), "DD-MM-YYYY", true);
+
           if (!parsedDate.isValid()) {
             console.warn(`Invalid date format in row: ${JSON.stringify(row)}`);
             return; // Skip rows with invalid dates
           }
-
-          // Extract the month as `YYYY-MM`
-          const month = parsedDate.format("YYYY-MM");
-
           // Prepare the key for grouping
-          const key = `${item.trim()}_${month}`;
+          const key = `${Product_ID.trim()}_${Month}`;
 
           // Aggregate data
           if (!salesData.has(key)) {
             salesData.set(key, {
-              productId: item.trim(),
-              productName: product_name?.trim() || null,
-              unitsSold: parseInt(unitSold.trim(), 10), // Fix field name here
-              sales: parseInt(sales.trim(), 10),
-              month,
+              productId: Product_ID.trim(),
+              productName: Product_Name?.trim() || null,
+              unitsSold: parseInt(Sales.trim(), 10), // Fix field name here
+              sales: parseInt(Sales_Revenue.trim(), 10),
+              month: Month,
+              date: parsedDate,
+              weekday: Weekday,
+              festival: Festival_Flag,
+              promotion: Promotion,
+              pricePerUnit: Price,
+              adSpent: Advertising_Spend,
+              weather: Weather,
+              customerSegment: Customer_Segment,
+              stockLevel: Stock_Level,
+              region: Region,
               companyName: req.user?.companyName || "Default Company", // Default value for company
               filePath: csvFilePath,
             });
           } else {
             const existingData = salesData.get(key);
-            existingData.unitsSold += parseInt(unitSold.trim(), 10); // Fix field name here
-            existingData.sales += parseInt(sales.trim(), 10);
+            existingData.unitsSold += parseInt(Sales.trim(), 10); // Fix field name here
+            existingData.sales += parseInt(Sales_Revenue.trim(), 10);
             salesData.set(key, existingData);
           }
         } catch (rowError) {
@@ -200,6 +231,7 @@ export const updatedcreateSaleController = async (req, res) => {
       .on("end", async () => {
         try {
           // Prepare final aggregated data
+          // console.log("salesData:- ", salesData);
           const aggregatedSalesData = Array.from(salesData.values());
 
           // Insert all valid aggregated sales data into MongoDB
@@ -207,7 +239,7 @@ export const updatedcreateSaleController = async (req, res) => {
 
           // Cleanup: Delete the uploaded CSV file
           // fs.unlinkSync(csvFilePath);
-
+          // console.log(savedRecords);
           res.status(201).json({
             success: true,
             message: "Sales records processed successfully",
@@ -320,7 +352,7 @@ export const forecasting = async (req, res) => {
         month: item.month,
         location: item.location,
         predicted_unit: item.total_unitSold,
-        companyName:company
+        companyName: company,
       });
       // Save the forecast object, e.g., to a database
       forecast

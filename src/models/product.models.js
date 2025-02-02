@@ -22,16 +22,8 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    storeId: {
-      type: Number,
-      required: true,
-    },
-    location: {
+    region: {
       type: String,
-      required: true,
-    },
-    storeStock: {
-      type: Number,
       required: true,
     },
   },
