@@ -16,9 +16,6 @@ const storeForecastSchema = new mongoose.Schema({
     month:{
         type:String,
     },
-    location:{
-        type:String,
-    },
     predicted_unit:{
         type:Number
     }

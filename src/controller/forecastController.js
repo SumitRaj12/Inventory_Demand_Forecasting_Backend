@@ -4,12 +4,13 @@ export const getStoreForecast = async (req, res) => {
   try {
     const employee = req.user;
     const company = employee.companyName;
-    const { location } = req.body;
-
+    const { storeId } = req.body;
+    console.log(storeId)
     const details = await Forecast.find({
       companyName: company,
-      location: location,
+      storeId:storeId
     });
+    console.log()
     return res.status(200).json({
         status:"Success",
         message:"Fetch Successful",
@@ -54,12 +55,13 @@ export const getStoreProduct = async(req,res)=>{
         const stores = new Set();
         const products = new Set();
         const company = (req.user).companyName
-        const details = await Forecast.find({companyName:company}).select("product_name location")
+        const details = await Forecast.find({companyName:company}).select("product_name storeId")
+        // console.log(detail)
         details.forEach((item)=>{
-            stores.add(item.location);
+            stores.add(item.storeId);
             products.add(item.product_name)
         })
-
+        console.log(stores)
         return res.status(200).json({
             status:"Success",
             message:"Fetch Successful",

@@ -316,10 +316,11 @@ export const forecasting = async (req, res) => {
       console.log(filePath);
     } else {
       // If no file is uploaded, fetch the file path from the database (old data)
-      const salesRecord = await Sales.findOne({ companyName: company });
-      if (salesRecord && salesRecord.filePath) {
-        filePath = salesRecord.filePath;
-      }
+      // const salesRecord = await Sales.findOne({ companyName: company });
+      // if (salesRecord && salesRecord.filePath) {
+      //   filePath = salesRecord.filePath;
+      // }
+      filePath = 'C:/Campus/Final Year Project/StockSage/Stocksage-backend/uploads/sales.csv'
     }
 
     // If no file path is found, return an error
@@ -343,19 +344,18 @@ export const forecasting = async (req, res) => {
     );
     // console.log(modelResponse.data.product)
     const store_data = modelResponse.data.store_aggregated_prediction;
-
+    console.log("Obtained result")
     store_data.forEach((item) => {
       const forecast = new Forecast({
         storeId: item.store,
         productId: item.item,
         product_name: item.product_name,
         month: item.month,
-        location: item.location,
         predicted_unit: item.total_unitSold,
         companyName: company,
       });
       // Save the forecast object, e.g., to a database
-      forecast
+     forecast
         .save()
         .then(() => {
           // console.log(`Forecast for ${item.product_name} saved successfully.`);
@@ -405,7 +405,7 @@ const generateReport = async (jsonData) => {
           "Product Name",
           "Predicted Units",
           "Month",
-          "Store with Highest Units",
+          "Region with Highest Units",
         ],
       ],
       body: tableData,
